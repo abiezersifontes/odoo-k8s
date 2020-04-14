@@ -1,0 +1,41 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: odoo-shop
+  namespace: odoo
+  labels:
+    app: odoo-shop
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: odoo-shop
+        tier: frontend
+    spec:
+      containers:
+        - image: abiezeropenti/openti:v0.0.8.16.7
+          name: odoo-shop
+          env:
+          - name: HOST
+            value: odoo-db
+          - name: USER
+            value: odoo
+          - name: PASSWORD
+            value: password
+          securityContext:
+            privileged: true
+            runAsUser: 0
+          ports:
+            - containerPort: 8069
+              name: odoo
+          volumeMounts:
+          - name: odoo-pvc
+            mountPath: /var/lib/odoo
+      volumes:
+      - name: odoo-pvc
+        persistentVolumeClaim:
+          claimName: odoo-pvc
